@@ -10,6 +10,7 @@ class DiscordHandler extends ReportHandler {
   final Logger _logger = Logger("DiscordHandler");
 
   final String webhookUrl;
+  final String messages;
 
   final bool printLogs;
   final bool enableDeviceParameters;
@@ -19,6 +20,7 @@ class DiscordHandler extends ReportHandler {
 
   DiscordHandler(
     this.webhookUrl, {
+    this.messages,
     this.printLogs = false,
     this.enableDeviceParameters = false,
     this.enableApplicationParameters = false,
@@ -101,6 +103,11 @@ class DiscordHandler extends ReportHandler {
       }
       stringBuffer.write("\n\n");
     }
+
+    if (messages != null || messages != "") {
+      stringBuffer.write("**Messages:**\n$messages\n\n");
+    }
+
     return stringBuffer.toString();
   }
 

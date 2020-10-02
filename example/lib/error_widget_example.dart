@@ -45,9 +45,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   ///Trigger "normal" mode
-  Widget _buildNormalErrorWidget() {
-    return ChildWidget();
-  }
+  // Widget _buildNormalErrorWidget() {
+  //   return ChildWidget();
+  // }
 
   ///Trigger "small" mode
   Widget _buildSmallErrorWidget() {
