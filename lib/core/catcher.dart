@@ -551,4 +551,19 @@ class Catcher with ReportModeAction {
     }
     return PlatformType.Unknown;
   }
+
+  @override
+  void initialAction(Report report) {
+    ReportHandler reportHandler =
+        _getReportHandlerFromExplicitExceptionHandlerMap(report.error);
+    if (reportHandler != null) {
+      _logger.info("Using explicit report handler");
+      _handleReport(report, reportHandler);
+      return;
+    }
+
+    for (ReportHandler handler in _currentConfig.initialHandler) {
+      _handleReport(report, handler);
+    }
+  }
 }

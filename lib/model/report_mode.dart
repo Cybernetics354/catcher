@@ -27,6 +27,10 @@ abstract class ReportMode {
     _reportModeAction.onActionConfirmed(report);
   }
 
+  void initialAction(Report report) {
+    _reportModeAction.initialAction(report);
+  }
+
   /// On user has rejected report
   void onActionRejected(Report report) {
     _reportModeAction.onActionRejected(report);

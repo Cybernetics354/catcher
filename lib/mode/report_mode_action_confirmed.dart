@@ -6,4 +6,7 @@ abstract class ReportModeAction {
 
   /// Code which should be triggered if report mode has been rejected
   void onActionRejected(Report report);
+
+  // Code which should be triggered on initial mode
+  void initialAction(Report report);
 }

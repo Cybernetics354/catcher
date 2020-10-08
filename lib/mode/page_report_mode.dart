@@ -52,6 +52,12 @@ class PageWidget extends StatefulWidget {
 
 class PageWidgetState extends State<PageWidget> {
   @override
+  void initState() { 
+    super.initState();
+    _onInitial();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CatcherUtils.isCupertinoAppAncestor(context)
         ? _buildCupertinoPage()
@@ -161,6 +167,10 @@ class PageWidgetState extends State<PageWidget> {
   void _onCancelClicked() {
     widget.pageReportMode.onActionRejected(widget.report);
     _closePage();
+  }
+
+  void _onInitial() {
+    widget.pageReportMode.initialAction(widget.report);
   }
 
   void _closePage() {

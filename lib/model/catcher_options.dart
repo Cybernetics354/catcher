@@ -6,6 +6,9 @@ import 'package:catcher/model/localization_options.dart';
 import 'package:catcher/model/report_mode.dart';
 
 class CatcherOptions {
+  // Handlers when initiate
+  final List<ReportHandler> initialHandler;
+
   /// Handlers that should be used
   final List<ReportHandler> handlers;
 
@@ -32,6 +35,7 @@ class CatcherOptions {
   /// Builds catcher options instance
   CatcherOptions(this.reportMode, this.handlers,
       {this.handlerTimeout = 5000,
+      this.initialHandler = const [],
       this.customParameters = const {},
       this.localizationOptions = const [],
       this.explicitExceptionReportModesMap = const {},
@@ -41,6 +45,7 @@ class CatcherOptions {
   CatcherOptions.getDefaultReleaseOptions()
       : this.handlers = [ConsoleHandler()],
         this.reportMode = DialogReportMode(),
+        this.initialHandler = const [],
         handlerTimeout = 5000,
         customParameters = Map(),
         localizationOptions = [],
@@ -51,6 +56,7 @@ class CatcherOptions {
   CatcherOptions.getDefaultDebugOptions()
       : this.handlers = [ConsoleHandler()],
         this.reportMode = SilentReportMode(),
+        this.initialHandler = const [],
         handlerTimeout = 10000,
         customParameters = Map(),
         localizationOptions = [],
@@ -61,6 +67,7 @@ class CatcherOptions {
   CatcherOptions.getDefaultProfileOptions()
       : this.handlers = [ConsoleHandler()],
         this.reportMode = SilentReportMode(),
+        this.initialHandler = const [],
         handlerTimeout = 10000,
         customParameters = Map(),
         localizationOptions = [],
