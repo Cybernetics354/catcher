@@ -23,8 +23,5 @@ export 'package:catcher/model/catcher_options.dart';
 export 'package:catcher/model/localization_options.dart';
 export 'package:catcher/core/catcher.dart';
 
-/// TODO:
-/// Just a dummy code to fix pubdev score
-/// This should be removed later
 @Deprecated("Don't use this!")
 void dummyCode() {}
