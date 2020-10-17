@@ -5,6 +5,7 @@ import 'package:catcher/utils/catcher_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:indonesia/indonesia.dart';
 import 'package:logging/logging.dart';
+import 'dart:convert';
 
 class SlackCustomHandler extends ReportHandler {
   final Dio _dio = Dio();
@@ -50,7 +51,7 @@ class SlackCustomHandler extends ReportHandler {
       }
 
       // String message = _buildMessage(report);
-      Map<String, dynamic> message = _buildNewMessage(report);
+      Map message = _buildNewMessage(report);
       message["channel"] = channel;
       message["username"] = username;
       message["icon_emoji"] = iconEmoji;
@@ -63,7 +64,8 @@ class SlackCustomHandler extends ReportHandler {
       // };
       
       _printLog("Sending request to Slack server...");
-      Response response = await _dio.post(webhookUrl, data: message);
+      Response response = await _dio.post(webhookUrl, data: jsonEncode(message));
+      // var response = await http.post(webhookUrl, body: jsonEncode(message));
       _printLog(
           "Server responded with code: ${response.statusCode} and message: ${response.statusMessage}");
       return response.statusCode >= 200 && response.statusCode < 300;
@@ -73,70 +75,130 @@ class SlackCustomHandler extends ReportHandler {
     }
   }
 
-  String _buildMessage(Report report) {
+  // String _buildMessage(Report report) {
+  //   StringBuffer stringBuffer = new StringBuffer();
+  //   stringBuffer.write("*Error:* ```${report.error}```\n");
+
+  //   if (enableStackTrace) {
+  //     stringBuffer.write("*Stack trace:* ```${report.stackTrace}```\n");
+  //   }
+
+  //   if (enableDeviceParameters && report.deviceParameters.length > 0) {
+  //     stringBuffer.write("*Device parameters:* ```");
+  //     for (var entry in report.deviceParameters.entries) {
+  //       stringBuffer.write("${entry.key}: ${entry.value}\n");
+  //     }
+  //     stringBuffer.write("```\n");
+  //   }
+
+  //   if (enableApplicationParameters &&
+  //       report.applicationParameters.length > 0) {
+  //     stringBuffer.write("*Application parameters:* ```");
+  //     for (var entry in report.applicationParameters.entries) {
+  //       stringBuffer.write("${entry.key}: ${entry.value}\n");
+  //     }
+  //     stringBuffer.write("```\n");
+  //   }
+
+  //   if (enableCustomParameters && report.customParameters.length > 0) {
+  //     stringBuffer.write("*Custom parameters:* ```");
+  //     for (var entry in report.customParameters.entries) {
+  //       stringBuffer.write("${entry.key}: ${entry.value}\n");
+  //     }
+  //     stringBuffer.write("```\n");
+  //   }
+  //   return stringBuffer.toString();
+  // }
+
+  Map _buildNewMessage(Report report) {
+    var map = Map();
+    String deviceParameter;
+    String applicationParameter;
+    List<Map<String, dynamic>> stackTrace = [];
     StringBuffer stringBuffer = new StringBuffer();
-    stringBuffer.write("*Error:* ```${report.error}```\n");
-    if (enableStackTrace) {
-      stringBuffer.write("*Stack trace:* ```${report.stackTrace}```\n");
-    }
-    if (enableDeviceParameters && report.deviceParameters.length > 0) {
-      stringBuffer.write("*Device parameters:* ```");
-      for (var entry in report.deviceParameters.entries) {
-        stringBuffer.write("${entry.key}: ${entry.value}\n");
-      }
-      stringBuffer.write("```\n");
+
+    for(var entry in report.applicationParameters.entries) {
+      stringBuffer.write("- *${entry.key}:* ${entry.value}\n");
     }
 
-    if (enableApplicationParameters &&
-        report.applicationParameters.length > 0) {
-      stringBuffer.write("*Application parameters:* ```");
-      for (var entry in report.applicationParameters.entries) {
-        stringBuffer.write("${entry.key}: ${entry.value}\n");
-      }
-      stringBuffer.write("```\n");
+    applicationParameter = stringBuffer.toString();
+    stringBuffer.clear();
+
+    for(var entry in report.deviceParameters.entries) {
+      stringBuffer.write("- *${entry.key}:* ${entry.value}\n");
     }
 
-    if (enableCustomParameters && report.customParameters.length > 0) {
-      stringBuffer.write("*Custom parameters:* ```");
-      for (var entry in report.customParameters.entries) {
-        stringBuffer.write("${entry.key}: ${entry.value}\n");
-      }
-      stringBuffer.write("```\n");
-    }
-    return stringBuffer.toString();
-  }
+    deviceParameter = stringBuffer.toString();
+    stringBuffer.clear();
 
-  Map<String, dynamic> _buildNewMessage(Report report) {
-    var map = Map<String, dynamic>();
+    stringBuffer.write(report.stackTrace);
+
+    List<String> stackList = stringBuffer.toString().split("\n");
+    StringBuffer stackTraceData = new StringBuffer();
+    int counter = 0;
+
+    for(int i = 0; i < stackList.length; i++) {
+      if(stackTrace.length >= 3) {
+        break;
+      }
+
+      final _cindex = stackList[i];
+
+      if(_cindex == "") continue;
+
+      if(counter + _cindex.length > 2500) {
+        stackTrace.add({
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": stackTraceData.toString().substring(0, stackTraceData.length - 1)
+          }
+        });
+
+        stackTraceData.clear();
+        counter = 0;
+      }
+
+      stackTraceData.write("$_cindex\n");
+      counter+=_cindex.length;
+    }
+
+    if(counter > 0 && stackTrace.length < 3) {
+      stackTrace.add({
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": stackTraceData.toString()
+        }
+      });
+    }
+
     map["blocks"] = [
       {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": "Error thrown at *${tanggal(DateTime.now())}* | *${DateTime.now().toString()}*"
+          "text": "Something when wrong at *${tanggal(DateTime.now())}* | *${DateTime.now().toString()}*"
         }
       },
-      {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "*Error:*\n```${report.error}```"
-        }
-      }
     ];
 
     map["attachments"] = [
       {
+        "color": "#ff2121",
+        "blocks": [
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "```${report.error.toString()}```"
+            }
+          }
+        ]
+      },
+      {
         "color": "#ffba26",
-        "blocks": [
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "*Stack traces:*\n- ${report.stackTrace}"
-            }
-          }
-        ]
+        "blocks": stackTrace
       },
       {
         "color": "#2684ff",
@@ -145,19 +207,14 @@ class SlackCustomHandler extends ReportHandler {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": "*Device parameters:*\n- ${report.deviceParameters}"
+              "text": "*Device parameters:*\n${deviceParameter.toString()}"
             }
-          }
-        ]
-      },
-      {
-        "color": "#2684ff",
-        "blocks": [
+          },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": "*Application parameters:*\n- ${report.applicationParameters}"
+              "text": "*Application parameters:*\n${applicationParameter.toString()}"
             }
           }
         ]
