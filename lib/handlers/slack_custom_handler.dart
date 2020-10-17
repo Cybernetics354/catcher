@@ -207,16 +207,16 @@ class SlackCustomHandler extends ReportHandler {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": "*Device parameters:*\n${deviceParameter.toString()}"
+              "text": "*Application parameters:*\n${applicationParameter.toString()}"
             }
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": "*Application parameters:*\n${applicationParameter.toString()}"
+              "text": "*Device parameters:*\n${deviceParameter.toString()}"
             }
-          }
+          },
         ]
       },
     ];
