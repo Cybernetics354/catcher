@@ -241,7 +241,7 @@ class Catcher with ReportModeAction {
 
   double convertToMb(int value) {
     double decrement = 1024.0 * 1024.0;
-    return double.parse(value.toString()) / decrement;
+    return double.parse(value.toString()).roundToDouble() / decrement;
   }
 
   void _loadAndroidParameters(AndroidDeviceInfo androidDeviceInfo) {
