@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info/package_info.dart';
+import 'package:system_info/system_info.dart';
 
 class Catcher with ReportModeAction {
   static Catcher _instance;
@@ -238,6 +239,11 @@ class Catcher with ReportModeAction {
     _deviceParameters["cookieEnabled"] = cookieEnabled.toString();
   }
 
+  double convertToMb(int value) {
+    double value = 1024.0 * 1024.0;
+    return double.parse(value.toString()) / value;
+  }
+
   void _loadAndroidParameters(AndroidDeviceInfo androidDeviceInfo) {
     _deviceParameters["id"] = androidDeviceInfo.id;
     _deviceParameters["androidId"] = androidDeviceInfo.androidId;
@@ -265,6 +271,11 @@ class Catcher with ReportModeAction {
     _deviceParameters["versionSdk"] = androidDeviceInfo.version.sdkInt;
     _deviceParameters["versionSecurityPatch"] =
         androidDeviceInfo.version.securityPatch;
+    _deviceParameters["totalPhysicalMemoryInMB"] = convertToMb(SysInfo.getTotalPhysicalMemory());
+    _deviceParameters["totalVirtualMemoryInMB"] = convertToMb(SysInfo.getTotalVirtualMemory());
+    _deviceParameters["currentPhysicalMemoryInMB"] = convertToMb(SysInfo.getFreePhysicalMemory());
+    _deviceParameters["currentVirtualMemoryInMB"] = convertToMb(SysInfo.getFreeVirtualMemory());
+    _deviceParameters["virtualMemorySizeInMB"] = convertToMb(SysInfo.getVirtualMemorySize());
   }
 
   void _loadIosParameters(IosDeviceInfo iosInfo) {
@@ -279,6 +290,11 @@ class Catcher with ReportModeAction {
     _deviceParameters["utsnameMachine"] = iosInfo.utsname.machine;
     _deviceParameters["utsnameNodename"] = iosInfo.utsname.nodename;
     _deviceParameters["utsnameSysname"] = iosInfo.utsname.sysname;
+    _deviceParameters["totalPhysicalMemoryInMB"] = convertToMb(SysInfo.getTotalPhysicalMemory());
+    _deviceParameters["totalVirtualMemoryInMB"] = convertToMb(SysInfo.getTotalVirtualMemory());
+    _deviceParameters["currentPhysicalMemoryInMB"] = convertToMb(SysInfo.getFreePhysicalMemory());
+    _deviceParameters["currentVirtualMemoryInMB"] = convertToMb(SysInfo.getFreeVirtualMemory());
+    _deviceParameters["virtualMemorySizeInMB"] = convertToMb(SysInfo.getVirtualMemorySize());
   }
 
   void _loadApplicationInfo() {
