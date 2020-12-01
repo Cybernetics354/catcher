@@ -239,9 +239,11 @@ class Catcher with ReportModeAction {
     _deviceParameters["cookieEnabled"] = cookieEnabled.toString();
   }
 
-  double convertToMb(int value) {
+  String convertToMb(int value) {
     double decrement = 1024.0 * 1024.0;
-    return double.parse(value.toString()).roundToDouble() / decrement;
+    double res = double.parse(value.toString()) / decrement;
+
+    return "${res.toStringAsFixed(1)} MB";
   }
 
   void _loadAndroidParameters(AndroidDeviceInfo androidDeviceInfo) {
